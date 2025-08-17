@@ -35,9 +35,9 @@ inline double simple_quad_inout(double t)
 inline double simple_quad_outin(double t)
 {
     if (t < 0.5)
-        return simple_quad_out(t * 2.0) * 0.5;
-
-    return simple_quad_in(t * 2.0 - 1.0) * 0.5 + 0.5;
+        return simple_quad_inout(0.5 + t) - 0.5;
+    else
+        return simple_quad_inout(t - 0.5) + 0.5;
 }
 
 inline double simple_sin_in(double t)
@@ -58,9 +58,9 @@ inline double simple_sin_inout(double t)
 inline double simple_sin_outin(double t)
 {
     if (t < 0.5)
-        return simple_sin_out(t * 2.0) * 0.5;
-
-    return simple_sin_in(t * 2.0 - 1.0) * 0.5 + 0.5;
+        return simple_sin_inout(0.5 + t) - 0.5;
+    else
+        return simple_sin_inout(t - 0.5) + 0.5;
 }
 
 inline double simple_exp_in(double t)
@@ -84,9 +84,9 @@ inline double simple_exp_inout(double t)
 inline double simple_exp_outin(double t)
 {
     if (t < 0.5)
-        return simple_exp_out(t * 2.0) * 0.5;
-
-    return simple_exp_in(t * 2.0 - 1.0) * 0.5 + 0.5;
+        return simple_exp_inout(0.5 + t) - 0.5;
+    else
+        return simple_exp_inout(t - 0.5) + 0.5;
 }
 
 inline double simple_circ_in(double t)
@@ -111,9 +111,9 @@ inline double simple_circ_inout(double t)
 inline double simple_circ_outin(double t)
 {
     if (t < 0.5)
-        return simple_circ_out(t * 2.0) * 0.5;
-
-    return simple_circ_in(t * 2.0 - 1.0) * 0.5 + 0.5;
+        return simple_circ_inout(0.5 + t) - 0.5;
+    else
+        return simple_circ_inout(t - 0.5) + 0.5;
 }
 
 inline double simple_cube_in(double t)
@@ -138,9 +138,9 @@ inline double simple_cube_inout(double t)
 inline double simple_cube_outin(double t)
 {
     if (t < 0.5)
-        return simple_cube_out(t * 2.0) * 0.5;
-
-    return simple_cube_in(t * 2.0 - 1.0) * 0.5 + 0.5;
+        return simple_cube_inout(0.5 + t) - 0.5;
+    else
+        return simple_cube_inout(t - 0.5) + 0.5;
 }
 
 inline double simple_quartic_in(double t)
@@ -165,9 +165,9 @@ inline double simple_quartic_inout(double t)
 inline double simple_quartic_outin(double t)
 {
     if (t < 0.5)
-        return simple_quartic_out(t * 2.0) * 0.5;
-
-    return simple_quartic_in(t * 2.0 - 1.0) * 0.5 + 0.5;
+        return simple_quartic_inout(0.5 + t) - 0.5;
+    else
+        return simple_quartic_inout(t - 0.5) + 0.5;
 }
 
 inline double simple_quintic_in(double t)
@@ -192,9 +192,9 @@ inline double simple_quintic_inout(double t)
 inline double simple_quintic_outin(double t)
 {
     if (t < 0.5)
-        return simple_quintic_out(t * 2.0) * 0.5;
-
-    return simple_quintic_in(t * 2.0 - 1.0) * 0.5 + 0.5;
+        return simple_quintic_inout(0.5 + t) - 0.5;
+    else
+        return simple_quintic_inout(t - 0.5) + 0.5;
 }
 
 inline double simple_back_in(double t)
@@ -227,9 +227,9 @@ inline double simple_back_inout(double t)
 inline double simple_back_outin(double t)
 {
     if (t < 0.5)
-        return simple_back_out(t * 2.0) * 0.5;
-
-    return simple_back_in(t * 2.0 - 1.0) * 0.5 + 0.5;
+        return simple_back_inout(0.5 + t) - 0.5;
+    else
+        return simple_back_inout(t - 0.5) + 0.5;
 }
 
 inline double simple_elastic_in(double t)
@@ -274,9 +274,9 @@ inline double simple_elastic_inout(double t)
 inline double simple_elastic_outin(double t)
 {
     if (t < 0.5)
-        return simple_elastic_out(t * 2.0) * 0.5;
-
-    return simple_elastic_in(t * 2.0 - 1.0) * 0.5 + 0.5;
+        return simple_elastic_inout(0.5 + t) - 0.5;
+    else
+        return simple_elastic_inout(t - 0.5) + 0.5;
 }
 
 inline double simple_bounce_out(double t)
@@ -321,9 +321,9 @@ inline double simple_bounce_inout(double t)
 inline double simple_bounce_outin(double t)
 {
     if (t < 0.5)
-        return simple_bounce_out(t * 2.0) * 0.5;
-
-    return simple_bounce_in(t * 2.0 - 1.0) * 0.5 + 0.5;
+        return simple_bounce_inout(0.5 + t) - 0.5;
+    else
+        return simple_bounce_inout(t - 0.5) + 0.5;
 }
 
 } // namespace math
@@ -334,57 +334,6 @@ struct cubic_bezier_t { Point2 CP1, CP2; };
 
 template <size_t N>
 using sampled_curve_t = std::array<double, N>;
-
-constexpr auto sample_bezier_at_x(const cubic_bezier_t& curve, double linear_t) -> double
-{
-    constexpr auto bezier = []<typename T>(T cp1, T cp2, T t) -> T
-    {
-        const auto a = T{1} - t;
-        const auto b = a * a * a;
-        const auto c = t * t * t;
-
-        return T{3} * t * a * a * cp1 + T{3} * t * t * a * cp2 + c;
-    };
-
-    constexpr auto bezierDt = []<typename T>(T cp1, T cp2, T t) -> T
-    {
-        const auto a = T{1} - t;
-        const auto b = a * a;
-        const auto c = t * t;
-        const auto d = T{2} * t * a;
-
-        return T{3} * cp1 * (b - d) + T{3} * cp2 * (d - c) + T{3} * c;
-    };
-
-    constexpr auto newton_raphson_iteration_limit = 10;
-    constexpr auto newton_raphson_max_error       = 1e-6f;
-
-    auto curve_t = static_cast<double>(linear_t);
-    for (int i = 0; i < newton_raphson_iteration_limit; ++i)
-    {
-        const auto x  = bezier  (curve.CP1.x, curve.CP2.x, curve_t);
-        const auto dx = bezierDt(curve.CP1.x, curve.CP2.x, curve_t);
-        if (dx == 0.0f) [[unlikely]] // avoid division by zero
-            break;
-        const auto diff = x - linear_t;
-        if (fabs(diff) < newton_raphson_max_error)
-            break;
-        curve_t -= diff / dx;
-
-        if (curve_t < 0.0f) [[unlikely]]
-        {
-            curve_t = 0.0f;
-            break;
-        }
-        else if (curve_t > 1.0f) [[unlikely]]
-        {
-            curve_t = 1.0f;
-            break;
-        }
-    }
-
-    return bezier(curve.CP1.y, curve.CP2.y, curve_t);
-}
 
 constexpr auto linear_sample(std::span<const Point2> points, double t) -> double
 {
@@ -412,20 +361,87 @@ constexpr auto linear_sample(std::span<const Point2> points, double t) -> double
     return v0 + (v1 - v0) * blendTime;
 }
 
-template <size_t N>
-constexpr void sample_curve_into(sampled_curve_t<N>& result, const source_func_t& f)
+template <typename T, T p1 = T{0}, T p2 = T{1}>
+constexpr auto bezier(T cp1, T cp2, T t) -> T
+{
+    const auto a = T{1} - t;
+    const auto b = a * a * a;
+    const auto c = t * t * t;
+
+    return b * p1 + T{3} * t * a * a * cp1 + T{3} * t * t * a * cp2 + c * p2;
+}
+
+template <typename T, T p1 = T{0}, T p2 = T{1}>
+constexpr auto bezierDt(T cp1, T cp2, T t) -> T
+{
+    const auto a = T{1} - t;
+    const auto b = a * a;
+    const auto c = t * t;
+    const auto d = T{2} * t * a;
+
+    return T{-3} * p1 * b + T{3} * cp1 * (b - d) + T{3} * cp2 * (d - c) + T{3} * c * p2;
+}
+
+template <double p1x = 0.0, double p1y = 0.0, double p2x = 1.0, double p2y = 1.0>
+constexpr auto sample_bezier_at_x(const cubic_bezier_t& curve, double linear_t) -> double
+{
+#if 1
+    constexpr auto newton_raphson_iteration_limit = 10;
+    constexpr auto newton_raphson_max_error       = 1e-6f;
+
+    auto curve_t = static_cast<double>(linear_t);
+    for (int i = 0; i < newton_raphson_iteration_limit; ++i)
+    {
+        const auto x  = bezier  <double, p1x, p2x>(curve.CP1.x, curve.CP2.x, curve_t);
+        const auto dx = bezierDt<double, p1x, p2x>(curve.CP1.x, curve.CP2.x, curve_t);
+        if (dx == 0.0f) [[unlikely]] // avoid division by zero
+            break;
+        const auto diff = x - linear_t;
+        if (fabs(diff) < newton_raphson_max_error)
+            break;
+        curve_t -= diff / dx;
+
+        if (curve_t < 0.0f) [[unlikely]]
+        {
+            curve_t = 0.0f;
+            break;
+        }
+        else if (curve_t > 1.0f) [[unlikely]]
+        {
+            curve_t = 1.0f;
+            break;
+        }
+    }
+#else
+    Point2 mapping[1001];
+    for (int i = 0; i < 1001; ++i)
+    {
+        const auto t = static_cast<double>(i) / 1000.0;
+        mapping[i] = { t, bezier<double, 0.0, 1.0>(curve.CP1.x, curve.CP2.x, t) };
+    }
+
+    auto curve_t = linear_sample(mapping, linear_t);
+
+#endif
+
+    return bezier<double, p1y, p2y>(curve.CP1.y, curve.CP2.y, curve_t);
+}
+
+template <size_t N, typename F>
+    requires std::is_invocable_r_v<double, F, double>
+constexpr void sample_curve_into(sampled_curve_t<N>& result, F&& f)
 {
     double step = 1.0 / (N - 1);
     for (int i = 0; i < N; ++i)
         result[i] = f(i * step);
 }
 
-template <size_t N>
+template <size_t N, double p1x = 0.0, double p1y = 0.0, double p2x = 1.0, double p2y = 1.0>
 constexpr void sample_curve_into(sampled_curve_t<N>& result, const cubic_bezier_t& curve)
 {
     double step = 1.0 / (N - 1);
     for (int i = 0; i < N; ++i)
-        result[i] = sample_bezier_at_x(curve, i * step);
+        result[i] = sample_bezier_at_x<p1x, p1y, p2x, p2y>(curve, i * step);
 }
 
 template <size_t N>
@@ -444,11 +460,11 @@ constexpr auto fit_error(sampled_curve_t<N>& reference, sampled_curve_t<N>& curv
     return error;
 }
 
-template <size_t N>
+template <size_t N, double p1x = 0.0, double p1y = 0.0, double p2x = 1.0, double p2y = 1.0>
 constexpr auto fit_error(sampled_curve_t<N>& reference, const cubic_bezier_t& curve) -> double
 {
     sampled_curve_t<N> curveSamples;
-    sample_curve_into(curveSamples, curve);
+    sample_curve_into<N, p1x, p1y, p2x, p2y>(curveSamples, curve);
     return fit_error(reference, curveSamples);
 }
 
@@ -472,8 +488,9 @@ struct function_t
     double          error = fit_error<1000>(func, curve);
 };
 
-template <size_t N = MAXPOINTS>
-auto graphics_gems_fit_curve(source_func_t f, double max_error) -> cubic_bezier_t
+template <size_t N = MAXPOINTS, typename F>
+    requires std::is_invocable_r_v<double, F, double>
+auto graphics_gems_fit_curve(F&& f, double max_error) -> cubic_bezier_t
 {
     Point2 data[N];
     double step = 1.0 / (N - 1);
@@ -577,14 +594,14 @@ void brute_force_fit_curve_many(std::span<function_t> functions, int NX, int NY)
     }
 }
 
-template <size_t N = 100>
+template <size_t N = 100, double p1x = 0.0, double p1y = 0.0, double p2x = 1.0, double p2y = 1.0>
 auto brute_force_refine_curve(sampled_curve_t<N> reference, int NX, int NY, cubic_bezier_t base, double rangeX, double rangeY, int iterations_left) -> cubic_bezier_t
 {
     if (iterations_left <= 0)
         return base;
 
-    const auto x_units = NX;
-    const auto y_units = NY;
+    const auto x_units = NX + (NX % 2 ? 0 : 1); // always use odd number of units to ensure original point is included
+    const auto y_units = NY + (NX % 2 ? 0 : 1); // always use odd number of units to ensure original point is included
 
     const auto x1_min   = std::max(0.0, base.CP1.x - rangeX * 0.5);
     const auto x1_max   = std::min(1.0, base.CP1.x + rangeX * 0.5);
@@ -603,7 +620,7 @@ auto brute_force_refine_curve(sampled_curve_t<N> reference, int NX, int NY, cubi
     const auto y2_step  = (y1_max - y1_min) / y_units;
 
     cubic_bezier_t best_fit_curve = base;
-    double best_error = fit_error(reference, base);
+    double best_error = fit_error<N, p1x, p1y, p2x, p2y>(reference, base);
     for (int x1 = 0; x1 < x_units; ++x1)
     {
         for (int y1 = 0; y1 < y_units; ++y1)
@@ -618,7 +635,7 @@ auto brute_force_refine_curve(sampled_curve_t<N> reference, int NX, int NY, cubi
                     curve.CP2.x = x2_min + x2 * x2_step;
                     curve.CP2.y = y2_min + y2 * y2_step;
 
-                    const auto error = fit_error(reference, curve);
+                    const auto error = fit_error<N, p1x, p1y, p2x, p2y>(reference, curve);
                     if (error < best_error)
                     {
                         best_fit_curve = curve;
@@ -629,7 +646,7 @@ auto brute_force_refine_curve(sampled_curve_t<N> reference, int NX, int NY, cubi
         }
     }
 
-    return brute_force_refine_curve(reference, NX, NY, best_fit_curve, rangeX * 0.25, rangeY * 0.25, iterations_left - 1);
+    return brute_force_refine_curve<N, p1x, p1y, p2x, p2y>(reference, NX, NY, best_fit_curve, rangeX * 0.25, rangeY * 0.25, iterations_left - 1);
 }
 
 template <size_t N = 100>
@@ -774,9 +791,180 @@ function_t functions[] =
 
 };
 
+double parabola(double t)
+{
+    return (1.0 - (t - 0.5) * (t - 0.5) * 4.0);
+}
+
+cubic_bezier_t fit_parabola_curve()
+{
+    cubic_bezier_t curve;
+    curve.CP1.x = 1.0 / 3.0;
+    curve.CP1.y = 1.0 / 3.0 + 1.0;
+    curve.CP2.x = 2.0 / 3.0;
+    curve.CP2.y = 1.0 / 3.0 + 1.0;
+
+    return curve;
+}
+
+template <size_t N = 100>
+void fit_elastic_in()
+{
+    // math::simple_elastic_in
+
+    constexpr const double zero_points[] = { 0.0, 0.025, 0.175, 0.325, 0.475, 0.625, 0.775, 0.925, 1.0 };
+
+    auto fit_segment = []<double p2y>(double x1, double x2) -> std::pair<cubic_bezier_t, double>
+    {
+        const auto offset = x1;
+        const auto scale  = (x2 - offset);
+
+        auto function = [&](double t) -> double
+        {
+            return math::simple_elastic_in(t * scale + offset);
+        };
+
+        auto initial_guess = graphics_gems_fit_curve<N>(function, 0.0000001);
+
+        sampled_curve_t<N> reference;
+        sample_curve_into(reference, function);
+
+        auto curve = initial_guess;
+        int iteration_limit = 10;
+        while (fit_error<N, 0, 0, 1, p2y>(reference, curve) > 0.0000001)
+        {
+            if (iteration_limit-- <= 0)
+                break;
+
+            curve = brute_force_refine_curve<N, 0, 0, 1, p2y>(reference, 5, 10, curve, 0.5, 0.5, 10);
+        }
+
+        auto error = fit_error<N, 0, 0, 1, p2y>(reference, curve);
+
+        curve.CP1.x = curve.CP1.x * scale + offset;
+        curve.CP2.x = curve.CP2.x * scale + offset;
+
+        return { curve, error };
+    };
+
+    printf("// Fitting elastic-in curve segments:\n");
+    printf("{\n");
+    printf("    { %9.6f, %9.6f },\n", 0.0, 0.0);
+
+    constexpr auto segment_count = std::size(zero_points) - 1;
+    constexpr auto last_segment_index = segment_count - 1;
+    for (size_t i = 0; i < segment_count; ++i)
+    {
+        const auto offset = zero_points[i];
+        const auto scale  = (zero_points[i + 1] - offset);
+
+        const auto p2y = i == last_segment_index ? 1.0 : 0.0;
+
+        cubic_bezier_t curve;
+        float error = 0.0;
+        if (p2y < 1)
+        {
+            auto result = fit_segment.operator()<0>(offset, zero_points[i + 1]);
+            curve = result.first;
+            error = result.second;
+        }
+        else
+        {
+            auto result = fit_segment.operator()<1>(offset, zero_points[i + 1]);
+            curve = result.first;
+            error = result.second;
+        }
+
+        printf("    { %9.6f, %9.6f }, // error: %.20lf\n", curve.CP1.x, curve.CP1.y, error);
+        printf("    { %9.6f, %9.6f },\n", curve.CP2.x, curve.CP2.y);
+        printf("    { %9.6f, %9.6f },\n", zero_points[i + 1], p2y);
+    }
+    printf("}\n");
+}
+
+template <size_t N = 100>
+void fit_elastic_in_out_first_half()
+{
+    // first half of math::simple_elastic_in
+
+    constexpr const double roots[] = { 0.0, 0.10625 * 2.0, 0.21875 * 2.0, 0.33125 * 2.0, 0.44375 * 2.0, 1.0 };
+
+    auto fit_segment = []<double p1y, double p2y>(double x1, double x2) -> std::pair<cubic_bezier_t, double>
+    {
+        const auto offset = x1;
+        const auto scale  = (x2 - offset);
+
+        auto function = [&](double t) -> double
+        {
+            return math::simple_elastic_inout((t * scale + offset) * 0.5) * 2.0;
+        };
+
+        auto initial_guess = graphics_gems_fit_curve<N>(function, 0.0000001);
+
+        sampled_curve_t<N> reference;
+        sample_curve_into(reference, function);
+
+        auto curve = initial_guess;
+        int iteration_limit = 10;
+        while (fit_error<N, 0, p1y, 1, p2y>(reference, curve) > 0.0000001)
+        {
+            if (iteration_limit-- <= 0)
+                break;
+
+            curve = brute_force_refine_curve<N, 0, p1y, 1, p2y>(reference, 5, 10, curve, 0.5, 0.5, 10);
+        }
+
+        auto error = fit_error<N, 0, p1y, 1, p2y>(reference, curve);
+
+        curve.CP1.x = curve.CP1.x * scale + offset;
+        curve.CP2.x = curve.CP2.x * scale + offset;
+
+        return { curve, error };
+    };
+
+    printf("// Fitting elastic-in-out (first half) curve segments:\n");
+    printf("{\n");
+    printf("    { %9.6f, %9.6f },\n", 0.0, 0.0);
+
+    constexpr auto segment_count = std::size(roots) - 1;
+    constexpr auto last_segment_index = segment_count - 1;
+    for (size_t i = 0; i < segment_count; ++i)
+    {
+        const auto offset = roots[i];
+        const auto scale  = (roots[i + 1] - offset);
+
+        const auto p1y = 0.0;
+        const auto p2y = i == last_segment_index ? 1.0 : 0.0;
+
+        std::pair<cubic_bezier_t, double> result;
+
+        auto& [curve, error] = result;
+
+        if (p1y < 1 && p2y < 1)
+            result = fit_segment.operator()<0, 0>(offset, roots[i + 1]);
+        else if (p1y >= 1 && p2y < 1)
+            result = fit_segment.operator()<1, 0>(offset, roots[i + 1]);
+        else if (p1y < 1 && p2y >= 1)
+            result = fit_segment.operator()<0, 1>(offset, roots[i + 1]);
+        else
+            result = fit_segment.operator()<1, 1>(offset, roots[i + 1]);
+
+        printf("    { %9.6f, %9.6f }, // error: %.20lf\n", curve.CP1.x, curve.CP1.y, error);
+        printf("    { %9.6f, %9.6f },\n", curve.CP2.x, curve.CP2.y);
+        printf("    { %9.6f, %9.6f },\n", roots[i + 1], p2y);
+    }
+    printf("}\n");
+}
+
 int main()
 {
     constexpr size_t SAMPLES = 100;
+
+    // Convert elastic-in to set of cubic bezier curves
+    fit_elastic_in();
+
+    // Convert elastic-in-out (first half) to set of cubic bezier curves
+    fit_elastic_in_out_first_half();
 
     // Fit the curves using Philip J. Schneider piecewise cubic fitting from "Graphics Gems"
     graphics_gems_fit_curve_many<SAMPLES>(functions, 0.0000001);
